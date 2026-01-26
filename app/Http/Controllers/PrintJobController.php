@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Asset;
 use App\Models\PrintJob;
 use App\Models\PrintJobDetail;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Request;
+// use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use setasign\Fpdi\Fpdi;
 
@@ -43,21 +43,13 @@ class PrintJobController extends Controller
       }
     };
 
-    $validator = Validator::make($request->all(), [
+    $validator = $request->validate([
       'customer_name' => 'required|string|max:255',
       'customer_number' => 'required|string|max:255',
       'items' => 'required|array',
       'items.*.file' => 'required|file',
       'items.*.color' => ['required', 'string', $colorRule],
     ]);
-
-    if ($validator->fails()) {
-      return response()->json([
-        'message' => 'The given data was invalid.',
-        'errors' => $validator->errors()
-      ], 422);
-    }
-
 
     try {
 
@@ -158,10 +150,15 @@ class PrintJobController extends Controller
 
   public function show(PrintJob $printJob)
   {
+    // if (request()->wantsJson() && !request()->header('X-Inertia')) {
       return response()->json([
-          'success' => true,
-          'data' => $printJob->load(['details.asset', 'details.logs']),
+        'success' => true,
+        'data' => $printJob->load(['details.asset', 'details.logs']),
       ]);
+    // }
+    // return Inertia::render('print-job/print-detail', [
+    //   'detail' => $query
+    // ]);
   }
 
   public function simulatePayment(PrintJob $printJob)
@@ -257,9 +254,9 @@ class PrintJobController extends Controller
     try {
       // If pending, dispatch it. If queued, it's fine. Otherwise error.
       if ($printJob->status === 'pending') {
-          $printJob->dispatchToQueue();
+        $printJob->dispatchToQueue();
       } elseif ($printJob->status !== 'queued') {
-          throw new \Exception("Job cannot be queued. Current status: {$printJob->status}. Required: pending or queued.");
+        throw new \Exception("Job cannot be queued. Current status: {$printJob->status}. Required: pending or queued.");
       }
 
       $printerService->processNextItem();
