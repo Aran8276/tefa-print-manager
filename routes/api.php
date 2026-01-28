@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/print-job', [PrintJobController::class, 'store'])->name('print-jobs.store');
 
 // Get a specific print job
-Route::get('/print-job/{printJob}', [PrintJobController::class, 'show'])->name('print-jobs.show');
+Route::get('/print-job/{printJob}', [App\Http\Controllers\PrintJobController::class, 'show'])->name('print-jobs.show');
 
 // TODO : dummy routes!! disable this on prod
 // Mark order as paid
