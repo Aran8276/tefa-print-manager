@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('printer_info', function (Blueprint $table) {
             $table->id();
-            $table->sting("name");
+            $table->string("name");
             $table->integer("paper_remaining");
             $table->enum("status", ["ready", "offline", "busy"]);
             $table->boolean('primary')->default(false);
